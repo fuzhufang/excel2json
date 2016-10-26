@@ -12,7 +12,7 @@ namespace excel2json
     /// </summary>
     class JsonExporter
     {
-        Dictionary<string, Dictionary<string, object>> m_data;
+        List<Dictionary<string, object>> m_data;
 
         /// <summary>
         /// 构造函数：完成内部数据创建
@@ -26,7 +26,7 @@ namespace excel2json
             if (sheet.Rows.Count <= 0)
                 return;
 
-            m_data = new Dictionary<string, Dictionary<string, object>>();
+            m_data = new List<Dictionary<string, object>>();
 
             //--以第一列为ID，转换成ID->Object的字典
             int firstDataRow = headerRows - 1;
@@ -57,7 +57,7 @@ namespace excel2json
                         rowData[fieldName] = value;
                 }
 
-                m_data[ID] = rowData;
+                m_data.Add(rowData);
             }
         }
 
