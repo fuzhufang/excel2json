@@ -80,7 +80,7 @@ namespace excel2json
                 sbContent.AppendFormat("INSERT INTO `{0}`({1}) VALUES({2});\n",
                     tabelName, sbNames.ToString(), sbValues.ToString());
 #else
-                sbContent.AppendFormat("INSERT INTO `{0}` VALUES({1});\n",
+                sbContent.AppendFormat("INSERT INTO `{0}` VALUES ({1});\n",
                     tabelName, sbValues.ToString());
 #endif
 
@@ -99,18 +99,21 @@ namespace excel2json
             sb.AppendFormat("CREATE TABLE `{0}` (\n", tabelName);
 
             DataRow typeRow = sheet.Rows[0];
+            DataRow commentRow = sheet.Rows[1];
 
             foreach (DataColumn column in sheet.Columns)
             {
                 string filedName = column.ToString();
                 string filedType = typeRow[column].ToString();
+                string fieldComment = commentRow[column].ToString();
 
-                if (filedType == "varchar")
-                    sb.AppendFormat("`{0}` {1}(64),", filedName, filedType);
-                else if (filedType == "text")
-                    sb.AppendFormat("`{0}` {1}(256),", filedName, filedType);
-                else
-                    sb.AppendFormat("`{0}` {1},", filedName, filedType);
+                sb.AppendFormat("`{0}` {1} COMMENT '{2}', \n", filedName, filedType, fieldComment);
+                //if (filedType == "varchar")
+                //    sb.AppendFormat("`{0}` {1}(64),", filedName, filedType);
+                //else if (filedType == "text")
+                //    sb.AppendFormat("`{0}` {1}(256),", filedName, filedType);
+                //else
+                //    sb.AppendFormat("`{0}` {1},", filedName, filedType);
             }
 
             sb.AppendFormat("PRIMARY KEY (`{0}`) ", sheet.Columns[0].ToString());
