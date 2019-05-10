@@ -28,6 +28,9 @@ namespace excel2json
 
             m_data = new List<Dictionary<string, object>>();
 
+            DataRow typeRow = sheet.Rows[0];
+            DataRow commentRow = sheet.Rows[1];
+
             //--以第一列为ID，转换成ID->Object的字典
             int firstDataRow = headerRows - 1;
             for (int i = firstDataRow; i < sheet.Rows.Count; i++)
@@ -40,6 +43,10 @@ namespace excel2json
                 var rowData = new Dictionary<string, object>();
                 foreach (DataColumn column in sheet.Columns)
                 {
+                    string filedName = column.ToString();
+                    string filedType = typeRow[column].ToString();
+                    string fieldComment = commentRow[column].ToString();
+
                     object value = row[column];
                     // 去掉数值字段的“.0”
                     if (value.GetType() == typeof(double))
@@ -53,8 +60,34 @@ namespace excel2json
                     if (lowcase)    
                         fieldName = fieldName.ToLower();
 
+                    var s1 = value.ToString();
+                    var s2 = value.GetType();
+
+                    // excel里定义字符串类型，对象为空默认长度为0字符串
+                    if (s2.FullName== "System.DBNull" && ((filedType.IndexOf("varchar", 0) > -1) || (filedType.IndexOf("char", 0) > -1)))
+                    {
+                        value = "";
+                    }
+
+                    // excel里定义整数类型，对象为空默认0
+                    if (s2.FullName == "System.DBNull" && ((filedType.IndexOf("int", 0) > -1) || (filedType.IndexOf("unsigned", 0) > -1)))
+                    {
+                        value = 0;
+                    }
+
+                    // excel里定义浮点数类型，对象为空默认0
+                    if (s2.FullName == "System.DBNull" && ((filedType.IndexOf("float", 0) > -1) || (filedType.IndexOf("double", 0) > -1)))
+                    {
+                        value = 0;
+                    }
+
                     if (!string.IsNullOrEmpty(fieldName))
+                    {
                         rowData[fieldName] = value;
+                    }
+                    else
+                    {
+                    }
                 }
 
                 m_data.Add(rowData);
